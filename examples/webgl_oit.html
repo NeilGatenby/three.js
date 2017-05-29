@@ -341,90 +341,90 @@
 
                 var vertices = new Float32Array([
 
-        // center Z quad (yellow)
-         1,  1,  0,
-        -1,  1,  0,
-        -1, -1,  0,
-         1,  1,  0,
-        -1, -1,  0,
-         1, -1,  0,
+                    // center Z quad (yellow)
+                     1,  1,  0,
+                    -1,  1,  0,
+                    -1, -1,  0,
+                     1,  1,  0,
+                    -1, -1,  0,
+                     1, -1,  0,
 
-        // neg Z quad (red)
-         1,  1,  -2,
-        -1,  1,  -2,
-        -1, -1,  -2,
-         1,  1,  -2,
-        -1, -1,  -2,
-         1, -1,  -2,
-        
-        // pos Z quad (blue)
-         1,  1,  2,
-        -1,  1,  2,
-        -1, -1,  2,
-         1,  1,  2,
-        -1, -1,  2,
-         1, -1,  2,
+                    // neg Z quad (red)
+                     1,  1,  -2,
+                    -1,  1,  -2,
+                    -1, -1,  -2,
+                     1,  1,  -2,
+                    -1, -1,  -2,
+                     1, -1,  -2,
+                    
+                    // pos Z quad (blue)
+                     1,  1,  2,
+                    -1,  1,  2,
+                    -1, -1,  2,
+                     1,  1,  2,
+                    -1, -1,  2,
+                     1, -1,  2,
 
-        // pos X quad (cyan)
-         2, -1,  2,
-         2,  1,  2,
-         2,  1, -2,
-         2, -1,  2,
-         2,  1, -2,
-         2, -1, -2,
+                    // pos X quad (cyan)
+                     2, -1,  2,
+                     2,  1,  2,
+                     2,  1, -2,
+                     2, -1,  2,
+                     2,  1, -2,
+                     2, -1, -2,
 
-        // neg X quad (magenta)
-        -2,  1, -2,
-        -2,  1,  2,
-        -2, -1,  2,
-        -2, -1, -2,
-        -2,  1, -2,
-        -2, -1,  2,
+                    // neg X quad (magenta)
+                    -2,  1, -2,
+                    -2,  1,  2,
+                    -2, -1,  2,
+                    -2, -1, -2,
+                    -2,  1, -2,
+                    -2, -1,  2,
 
-        // pos Y quad (green)
-        -1,  2, -2,
-         1,  2, -2,
-         1,  2,  2,
-        -1,  2, -2,
-         1,  2,  2,
-        -1,  2,  2,
+                    // pos Y quad (green)
+                    -1,  2, -2,
+                     1,  2, -2,
+                     1,  2,  2,
+                    -1,  2, -2,
+                     1,  2,  2,
+                    -1,  2,  2,
 
-        // neg Y quad (grey)
-         1, -2,  2,
-         1, -2, -2,
-        -1, -2, -2,
-        -1, -2,  2,
-         1, -2,  2,
-        -1, -2, -2,
-    ]);
+                    // neg Y quad (grey)
+                     1, -2,  2,
+                     1, -2, -2,
+                    -1, -2, -2,
+                    -1, -2,  2,
+                     1, -2,  2,
+                    -1, -2, -2,
+                ]);
 
                 
                 geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
     
                 var colors = new Float32Array( 6 * 7 * 4, 4 );
 
-    // yellow
-    for ( var i = 0; i < 6; i++ ) colors.set([ 0.9, 0.9, 0.1, 0.5 ], i * 4 );
+                // yellow
+                for ( var i = 0; i < 6; i++ ) colors.set([ 0.9, 0.9, 0.1, 0.5 ], i * 4 );
 
-    // red
-    for ( var i = 6; i < 12; i++ ) colors.set([ 0.9, 0.1, 0.1, 0.25 ], i * 4 );
+                // red
+                for ( var i = 6; i < 12; i++ ) colors.set([ 0.9, 0.1, 0.1, 0.25 ], i * 4 );
 
-    // blue
-    for ( var i = 12; i < 18; i++ ) colors.set([ 0.1, 0.1, 0.9, 0.75 ], i * 4 );
+                // blue
+                for ( var i = 12; i < 18; i++ ) colors.set([ 0.1, 0.1, 0.9, 0.75 ], i * 4 );
 
-    // cyan
-    for ( var i = 18; i < 24; i++ ) colors.set([ 0.1, 0.9, 0.9, 0.333 ], i * 4 );
+                // cyan
+                for ( var i = 18; i < 24; i++ ) colors.set([ 0.1, 0.9, 0.9, 0.333 ], i * 4 );
 
-    // magenta
-    for ( var i = 24; i < 30; i++ ) colors.set([ 0.9, 0.1, 0.9, 0.666 ], i * 4 );
+                // magenta
+                for ( var i = 24; i < 30; i++ ) colors.set([ 0.9, 0.1, 0.9, 0.666 ], i * 4 );
 
-    // green
-    for ( var i = 30; i < 36; i++ ) colors.set([ 0.1, 0.9, 0.1, 0.5 ], i * 4 );
+                // green
+                for ( var i = 30; i < 36; i++ ) colors.set([ 0.1, 0.9, 0.1, 0.5 ], i * 4 );
 
-    // grey
-    for ( var i = 36; i < 42; i++ ) colors.set([ 0.7, 0.7, 0.7, 0.75 ], i * 4 );
+                // grey
+                for ( var i = 36; i < 42; i++ ) colors.set([ 0.7, 0.7, 0.7, 0.75 ], i * 4 );
 
-    geometry.addAttribute( 'rgba', new THREE.BufferAttribute( colors, 4 ) );
+                geometry.addAttribute( 'rgba', new THREE.BufferAttribute( colors, 4 ) );
 
 
                 // material
