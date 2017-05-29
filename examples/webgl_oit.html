@@ -291,8 +291,8 @@
                     scene.overrideMaterial = revealageMaterial;
                     renderer.render( scene, camera, revealageTexture );
 
-                    compositingUniforms[ "tAccumulation" ].value = accumulationTexture;
-                    compositingUniforms[ "tRevealage" ].value = revealageTexture;
+                    compositingUniforms[ "tAccumulation" ].value = accumulationTexture.texture;
+                    compositingUniforms[ "tRevealage" ].value = revealageTexture.texture;
 
                     renderer.render( quadScene, quadCamera );
 
