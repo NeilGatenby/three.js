@@ -64,28 +64,17 @@
 
             uniform mat4 modelViewMatrix;
             uniform mat4 projectionMatrix;
-            uniform mat4 viewMatrix;
-            uniform mat4 modelMatrix;
 
             attribute vec3 position;
-            attribute vec4 color;
+            attribute vec4 rgba;
 
             varying vec4 vColor;
 
-            varying float z;
-
             void main() {
 
-                vColor = color;
+                vColor = rgba;
 
                 gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-
-                vec4 z4 = modelViewMatrix * vec4( position, 1.0 );
-                z = ( z4.xyz / z4.w ).z;
-                z = z4.z;
-                // z = gl_Position.z;
-                // z = position.z;
-                // z = ( viewMatrix * vec4( position, 1.0 ) ).z;
 
             }
 
@@ -98,13 +87,9 @@
 
             varying vec4 vColor;
 
-            varying float z;
-
             void main() {
 
-                z; // to silence 'not read' warnings
-                vec4 color = vec4( vColor );
-                gl_FragColor = color;
+                gl_FragColor = vColor;
 
             }
 
@@ -123,70 +108,18 @@
 
         </script>
 
-        <script id="fragmentShaderQuad" type="x-shader/x-fragment">
-
-            uniform sampler2D tDiffuse;
-
-            varying vec2 vUv;
-
-            void main() {
-
-                vec4 texel = texture2D( tDiffuse, vUv );
-                gl_FragColor = texel;
-
-            }
-
-        </script>
-
         <script id="fragmentShaderAccumulation" type="x-shader/x-fragment">
 
             precision highp float;
             precision highp int;
 
-            varying float z;
-
             varying vec4 vColor;
-
-            float w( float a )
-            {
-
-                // eq. 10
-                // return a * max( 1e-2, 3.0 * 1e3 * pow( 1.0 - gl_FragCoord.z, 3.0 ) );
-
-                // eq. 9
-                //return a * clamp( 0.03 / ( 1e-5 + pow( abs( z ) / 200.0, 4.0 ) ), 1e-2, 3e3 );
-                
-
-                // weight function design
-                // float colorResistance = 1.0; // 1.0
-                // float rangeAdjustmentsClampBounds = 0.3; // 0.3
-                // float depth = abs( 1.0 - gl_FragCoord.z ); // abs( z )
-                // float orderingDiscrimination = 0.1; // 200.0
-                // float orderingStrength = 4.0; // 4.0
-                // float minValue = 1e-2;
-                // float maxValue = 3e3;
-                // return pow( a, colorResistance ) * 
-                //     clamp( 
-                //         rangeAdjustmentsClampBounds / 
-                //             ( 1e-5 + pow( depth / orderingDiscrimination, orderingStrength ) ),
-                //         minValue, maxValue 
-                //     );
-
-                float z2 = z;
-                //z2 = gl_FragCoord.z;
-
-                // eq. 7
-                return pow( a, 1.0 ) * clamp( 10.0 / ( 1e-5 + pow( abs( z2 ) / 5.0, 1.0 ) + pow( abs( z2 ) / 200.0, 1.0 ) ), 1e-2, 3e3 );
-                
-            }
 
             void main()
             {
 
-                z; // to silence 'not read' warnings
-                float ai = vColor.a;
-                vec3 Ci = vColor.rgb * ai;
-                gl_FragColor = vec4( Ci, ai ) * w( ai );
+                // NB pre-multiplied alpha
+                gl_FragColor = vec4( vColor.rgb * vColor.a, vColor.a );
 
             }
 
@@ -197,49 +130,15 @@
             precision highp float;
             precision highp int;
 
-            varying float z;
-
             varying vec4 vColor;
-
-            float w( float a )
-            {
-
-                // eq. 10
-                // return a * max( 1e-2, 3.0 * 1e3 * pow( 1.0 - gl_FragCoord.z, 3.0 ) );
-
-                // eq. 9
-                //return a * clamp( 0.03 / ( 1e-5 + pow( abs( z ) / 200.0, 4.0 ) ), 1e-2, 3e3 );
-                
-
-                // weight function design
-                // float colorResistance = 1.0; // 1.0
-                // float rangeAdjustmentsClampBounds = 0.3; // 0.3
-                // float depth = abs( 1.0 - gl_FragCoord.z ); // abs( z )
-                // float orderingDiscrimination = 0.1; // 200.0
-                // float orderingStrength = 4.0; // 4.0
-                // float minValue = 1e-2;
-                // float maxValue = 3e3;
-                // return pow( a, colorResistance ) * 
-                //     clamp( 
-                //         rangeAdjustmentsClampBounds / 
-                //             ( 1e-5 + pow( depth / orderingDiscrimination, orderingStrength ) ),
-                //         minValue, maxValue 
-                //     );
-
-                float z2 = z;
-                //z2 = gl_FragCoord.z;
-
-                // eq. 7
-                return pow( a, 1.0 ) * clamp( 10.0 / ( 1e-5 + pow( abs( z2 ) / 5.0, 1.0 ) + pow( abs( z2 ) / 200.0, 1.0 ) ), 1e-2, 3e3 );
-
-            }
 
             void main()
             {
 
-                z; // to silence 'not read' warnings
-                float ai = vColor.a;
-                gl_FragColor = vec4( vec3( w( ai ) ), 1.0 );
+                gl_FragColor = vColor.aaaa;
+
+                // The following gives a more solid look, but is "wrong" I think ...
+                // gl_FragColor = vec4(vColor.aaa, 1.0);
 
             }
 
@@ -256,9 +155,9 @@
             {
 
                 vec4 accum = texture2D( tAccumulation, vUv );
-                float r = texture2D( tRevealage, vUv ).r;
 
-                gl_FragColor = vec4( accum.rgb / clamp( accum.a, 1e-9, 5e9 ), r );
+                gl_FragColor = vec4( accum.rgb / clamp( accum.a, 1e-9, 5e9 ), 
+                                     texture2D( tRevealage, vUv ).r );
 
             }
 
@@ -307,7 +206,7 @@
                         magFilter: THREE.NearestFilter,
                         type: THREE.FloatType,
                         format: THREE.RGBAFormat,
-                        stencilBuffer: false,
+                        stencilBuffer: false
                     }
                 );
 
@@ -364,8 +263,8 @@
                 function onWindowResize(){
 
                     // FIXME results in distorted image
-                    // accumulationTexture.setSize( window.innerWidth, window.innerHeight );
-                    // revealageTexture.setSize( window.innerWidth, window.innerHeight );
+                    accumulationTexture.setSize( window.innerWidth, window.innerHeight );
+                    revealageTexture.setSize( window.innerWidth, window.innerHeight );
 
                 }
 
@@ -442,55 +341,102 @@
 
                 var vertices = new Float32Array([
 
-                    // center quad (yellow)
-                     1,  1,  0,
-                    -1,  1,  0,
-                    -1, -1,  0,
-                     1,  1,  0,
-                    -1, -1,  0,
-                     1, -1,  0,
+        // center Z quad (yellow)
+         1,  1,  0,
+        -1,  1,  0,
+        -1, -1,  0,
+         1,  1,  0,
+        -1, -1,  0,
+         1, -1,  0,
 
-                    // bottom left quad (red)
-                     0,  0, -1,
-                    -2,  0, -1,
-                    -2, -2, -1,
-                     0,  0, -1,
-                    -2, -2, -1,
-                     0, -2, -1,
-                    
-                    // top right quad (blue)
-                     2,  2,  1,
-                     0,  2,  1,
-                     0,  0,  1,
-                     2,  2,  1,
-                     0,  0,  1,
-                     2,  0,  1
+        // neg Z quad (red)
+         1,  1,  -2,
+        -1,  1,  -2,
+        -1, -1,  -2,
+         1,  1,  -2,
+        -1, -1,  -2,
+         1, -1,  -2,
+        
+        // pos Z quad (blue)
+         1,  1,  2,
+        -1,  1,  2,
+        -1, -1,  2,
+         1,  1,  2,
+        -1, -1,  2,
+         1, -1,  2,
 
-                ]);
+        // pos X quad (cyan)
+         2, -1,  2,
+         2,  1,  2,
+         2,  1, -2,
+         2, -1,  2,
+         2,  1, -2,
+         2, -1, -2,
+
+        // neg X quad (magenta)
+        -2,  1, -2,
+        -2,  1,  2,
+        -2, -1,  2,
+        -2, -1, -2,
+        -2,  1, -2,
+        -2, -1,  2,
+
+        // pos Y quad (green)
+        -1,  2, -2,
+         1,  2, -2,
+         1,  2,  2,
+        -1,  2, -2,
+         1,  2,  2,
+        -1,  2,  2,
+
+        // neg Y quad (grey)
+         1, -2,  2,
+         1, -2, -2,
+        -1, -2, -2,
+        -1, -2,  2,
+         1, -2,  2,
+        -1, -2, -2,
+    ]);
+
                 
                 geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
     
-                var colors = new Float32Array( 6 * 3 * 4, 4 );
+                var colors = new Float32Array( 6 * 7 * 4, 4 );
 
-                // center quad (yellow)
-                for ( var i = 0; i < 6; i++ ) colors.set([ 1, 1, 0, 0.5 ], i * 4 );
+    // yellow
+    for ( var i = 0; i < 6; i++ ) colors.set([ 0.9, 0.9, 0.1, 0.5 ], i * 4 );
 
-                // bottom left quad (red)
-                for ( var i = 6; i < 12; i++ ) colors.set([ 1, 0, 0, 0.5 ], i * 4 );
+    // red
+    for ( var i = 6; i < 12; i++ ) colors.set([ 0.9, 0.1, 0.1, 0.25 ], i * 4 );
 
-                // top right quad (blue)
-                for ( var i = 12; i < 18; i++ ) colors.set([ 0, 0, 1, 0.5 ], i * 4 );
+    // blue
+    for ( var i = 12; i < 18; i++ ) colors.set([ 0.1, 0.1, 0.9, 0.75 ], i * 4 );
 
-                geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 4 ) );
+    // cyan
+    for ( var i = 18; i < 24; i++ ) colors.set([ 0.1, 0.9, 0.9, 0.333 ], i * 4 );
+
+    // magenta
+    for ( var i = 24; i < 30; i++ ) colors.set([ 0.9, 0.1, 0.9, 0.666 ], i * 4 );
+
+    // green
+    for ( var i = 30; i < 36; i++ ) colors.set([ 0.1, 0.9, 0.1, 0.5 ], i * 4 );
+
+    // grey
+    for ( var i = 36; i < 42; i++ ) colors.set([ 0.7, 0.7, 0.7, 0.75 ], i * 4 );
+
+    geometry.addAttribute( 'rgba', new THREE.BufferAttribute( colors, 4 ) );
+
 
                 // material
 
+                // for "opaque", rather than OIT
                 var material = new THREE.RawShaderMaterial( {
                     vertexShader: document.getElementById( 'vertexShader' ).textContent,
                     fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
                     side: THREE.DoubleSide
                 });
 
+                // for "transparent", rather than OIT
                 transparentMaterial = new THREE.RawShaderMaterial( {
                     vertexShader: document.getElementById( 'vertexShader' ).textContent,
                     fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
@@ -589,19 +535,6 @@
                     scene.overrideMaterial = null;
 
                 }
-
-                // var i, o, u;
-                // var matrix = new THREE.Matrix4();
-                // var objects = scene.children;
-                // var nObjects = objects.length;
-                
-                // camera.updateMatrix();
-                // camera.updateMatrixWorld( true );
-                // camera.matrixWorldInverse.getInverse( camera.matrixWorld );
-                // camera.updateProjectionMatrix();
-
-                // console.log( camera );
-                // console.log( camera.matrixWorld.elements );
 
             }
 
