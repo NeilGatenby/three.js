@@ -165,6 +165,8 @@
 
         <script>
 
+            // See discussion at https://github.com/mrdoob/three.js/issues/9977
+
             if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
             var gl;
@@ -441,7 +443,8 @@
                     vertexShader: document.getElementById( 'vertexShader' ).textContent,
                     fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
                     side: THREE.DoubleSide,
-                    transparent: true
+                    transparent: true,
+                    depthWrite: false
                 });
 
                 var mesh = new THREE.Mesh( geometry, material );
